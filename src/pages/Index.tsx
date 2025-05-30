@@ -1,30 +1,25 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Trophy, Users, DollarSign, Gamepad2 } from 'lucide-react';
 import { useEffect } from 'react';
-
 const Index = () => {
-  const { user, loading } = useAuth();
+  const {
+    user,
+    loading
+  } = useAuth();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!loading && user) {
       navigate('/dashboard');
     }
   }, [user, loading, navigate]);
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+  return <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
@@ -40,19 +35,10 @@ const Index = () => {
               and win real cash prizes. Create your own tournaments or participate in existing ones.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg"
-                onClick={() => navigate('/auth')}
-              >
+              <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg" onClick={() => navigate('/auth')}>
                 Get Started
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-white text-white hover:bg-white hover:text-purple-900 px-8 py-3 text-lg"
-                onClick={() => navigate('/auth')}
-              >
+              <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="border-white hover:bg-white px-8 py-3 text-lg text-slate-950">
                 View Tournaments
               </Button>
             </div>
@@ -103,17 +89,11 @@ const Index = () => {
           <p className="text-gray-300 text-lg mb-8">
             Join thousands of players already competing in tournaments
           </p>
-          <Button 
-            size="lg" 
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-12 py-4 text-lg"
-            onClick={() => navigate('/auth')}
-          >
+          <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-12 py-4 text-lg" onClick={() => navigate('/auth')}>
             Start Playing Now
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
