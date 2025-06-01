@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CreateTournament from "./pages/CreateTournament";
+import TournamentDetail from "./pages/TournamentDetail";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/create-tournament" element={<CreateTournament />} />
+              <Route path="/tournament/:id" element={<TournamentDetail />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
