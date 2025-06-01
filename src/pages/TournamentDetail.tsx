@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +10,8 @@ import { Trophy, Users, DollarSign, Calendar, Clock, MapPin } from 'lucide-react
 import { useToast } from '@/hooks/use-toast';
 import TournamentBracket from '@/components/TournamentBracket';
 import ParticipantsList from '@/components/ParticipantsList';
+import TournamentManagement from '@/components/TournamentManagement';
+import TournamentLeaderboard from '@/components/TournamentLeaderboard';
 
 interface Tournament {
   id: string;
@@ -167,6 +168,8 @@ const TournamentDetail = () => {
     }
   };
 
+  const isCreator = user?.id === tournament?.creator_id;
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -269,10 +272,34 @@ const TournamentDetail = () => {
               </CardContent>
             </Card>
 
+            {/* Tournament Management - only show for creators */}
+            {isCreator && (
+              <TournamentManagement
+                tournament={tournament}
+                participants={participants}
+                isCreator={isCreator}
+                onTournamentUpdate={fetchTournamentData}
+              />
+            )}
+
             {/* Tournament Bracket */}
-            {tournament.status === 'in_progress' || tournament.status === 'completed' ? (
-              <TournamentBracket tournamentId={tournament.id} format={tournament.tournament_format} />
-            ) : null}
+            {(tournament.status === 'in_progress' || tournament.status === 'completed') && (
+              <TournamentBracket 
+                tournamentId={tournament.id} 
+                format={tournament.tournament_format}
+                canManage={isCreator}
+                onMatchUpdate={fetchTournamentData}
+              />
+            )}
+
+            {/* Tournament Results/Leaderboard */}
+            {(tournament.status === 'completed' || tournament.status === 'in_progress') && (
+              <TournamentLeaderboard
+                tournamentId={tournament.id}
+                tournamentFormat={tournament.tournament_format}
+                status={tournament.status}
+              />
+            )}
           </div>
 
           {/* Sidebar */}

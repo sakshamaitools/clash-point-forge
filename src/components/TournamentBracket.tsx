@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import MatchCard from './MatchCard';
 
 interface Match {
   id: string;
@@ -14,14 +15,23 @@ interface Match {
   winner_id: string | null;
   status: string;
   scheduled_time: string | null;
+  player1?: { username: string; display_name: string };
+  player2?: { username: string; display_name: string };
 }
 
 interface TournamentBracketProps {
   tournamentId: string;
   format: string;
+  canManage?: boolean;
+  onMatchUpdate?: () => void;
 }
 
-const TournamentBracket = ({ tournamentId, format }: TournamentBracketProps) => {
+const TournamentBracket = ({ 
+  tournamentId, 
+  format, 
+  canManage = false, 
+  onMatchUpdate 
+}: TournamentBracketProps) => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +43,11 @@ const TournamentBracket = ({ tournamentId, format }: TournamentBracketProps) => 
     try {
       const { data, error } = await supabase
         .from('matches')
-        .select('*')
+        .select(`
+          *,
+          player1:profiles!matches_player1_id_fkey(username, display_name),
+          player2:profiles!matches_player2_id_fkey(username, display_name)
+        `)
         .eq('tournament_id', tournamentId)
         .order('round_number')
         .order('match_number');
@@ -47,13 +61,10 @@ const TournamentBracket = ({ tournamentId, format }: TournamentBracketProps) => 
     }
   };
 
-  const getMatchStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-500';
-      case 'in_progress': return 'bg-yellow-500';
-      case 'scheduled': return 'bg-blue-500';
-      case 'disputed': return 'bg-red-500';
-      default: return 'bg-gray-500';
+  const handleMatchUpdate = () => {
+    fetchMatches();
+    if (onMatchUpdate) {
+      onMatchUpdate();
     }
   };
 
@@ -110,33 +121,16 @@ const TournamentBracket = ({ tournamentId, format }: TournamentBracketProps) => 
               <h3 className="font-semibold mb-4">
                 Round {roundNumber}
                 {format === 'single_elimination' && parseInt(roundNumber) === Math.max(...Object.keys(rounds).map(Number)) && ' (Final)'}
+                {format === 'round_robin' && ' (Round Robin)'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {roundMatches.map((match) => (
-                  <div key={match.id} className="border rounded-lg p-4 bg-white">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Match {match.match_number}</span>
-                      <Badge className={`${getMatchStatusColor(match.status)} text-white text-xs`}>
-                        {match.status}
-                      </Badge>
-                    </div>
-                    <div className="space-y-2">
-                      <div className={`p-2 rounded ${match.winner_id === match.player1_id ? 'bg-green-100' : 'bg-gray-50'}`}>
-                        <span className="text-sm">Player 1</span>
-                        {match.winner_id === match.player1_id && <span className="float-right text-green-600">👑</span>}
-                      </div>
-                      <div className="text-center text-xs text-gray-500">vs</div>
-                      <div className={`p-2 rounded ${match.winner_id === match.player2_id ? 'bg-green-100' : 'bg-gray-50'}`}>
-                        <span className="text-sm">Player 2</span>
-                        {match.winner_id === match.player2_id && <span className="float-right text-green-600">👑</span>}
-                      </div>
-                    </div>
-                    {match.scheduled_time && (
-                      <div className="mt-2 text-xs text-gray-600">
-                        {new Date(match.scheduled_time).toLocaleString()}
-                      </div>
-                    )}
-                  </div>
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    canManage={canManage}
+                    onMatchUpdate={handleMatchUpdate}
+                  />
                 ))}
               </div>
             </div>
