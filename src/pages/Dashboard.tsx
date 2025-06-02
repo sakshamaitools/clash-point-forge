@@ -1,11 +1,12 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trophy, Users, DollarSign } from 'lucide-react';
+import { Plus, Trophy, Users, DollarSign, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface Tournament {
@@ -23,6 +24,7 @@ interface Tournament {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { canManageTournaments, isAdmin, highestRole } = useUserRoles();
   const navigate = useNavigate();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,19 @@ const Dashboard = () => {
     }
   };
 
+  const getRoleColor = (role: string) => {
+    const colors = {
+      'player': 'bg-gray-500',
+      'tournament_organizer': 'bg-blue-500',
+      'moderator': 'bg-yellow-500',
+      'support_staff': 'bg-green-500',
+      'financial_manager': 'bg-purple-500',
+      'platform_administrator': 'bg-red-500',
+      'super_admin': 'bg-black'
+    };
+    return colors[role as keyof typeof colors] || 'bg-gray-500';
+  };
+
   if (!user) {
     return null;
   }
@@ -72,12 +87,29 @@ const Dashboard = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Tournament Dashboard</h1>
-            <p className="text-gray-600 mt-2">Compete in Fortnite tournaments and win prizes</p>
+            <div className="flex items-center space-x-4 mt-2">
+              <p className="text-gray-600">Compete in Fortnite tournaments and win prizes</p>
+              {highestRole && (
+                <Badge className={`${getRoleColor(highestRole)} text-white`}>
+                  {highestRole.replace('_', ' ')}
+                </Badge>
+              )}
+            </div>
           </div>
-          <Button onClick={() => navigate('/create-tournament')} className="flex items-center space-x-2">
-            <Plus className="h-4 w-4" />
-            <span>Create Tournament</span>
-          </Button>
+          <div className="flex space-x-2">
+            {canManageTournaments() && (
+              <Button onClick={() => navigate('/create-tournament')} className="flex items-center space-x-2">
+                <Plus className="h-4 w-4" />
+                <span>Create Tournament</span>
+              </Button>
+            )}
+            {isAdmin() && (
+              <Button onClick={() => navigate('/admin')} variant="outline" className="flex items-center space-x-2">
+                <Shield className="h-4 w-4" />
+                <span>Admin Panel</span>
+              </Button>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -142,9 +174,11 @@ const Dashboard = () => {
                 <Trophy className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No tournaments yet</h3>
                 <p className="text-gray-600 mb-4">Be the first to create a tournament!</p>
-                <Button onClick={() => navigate('/create-tournament')}>
-                  Create First Tournament
-                </Button>
+                {canManageTournaments() && (
+                  <Button onClick={() => navigate('/create-tournament')}>
+                    Create First Tournament
+                  </Button>
+                )}
               </div>
             )}
           </div>

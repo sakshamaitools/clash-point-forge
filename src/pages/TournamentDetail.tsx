@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,7 @@ interface Participant {
 const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { canManageTournaments, canModerate, isAdmin } = useUserRoles();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [tournament, setTournament] = useState<Tournament | null>(null);
@@ -168,7 +170,10 @@ const TournamentDetail = () => {
     }
   };
 
-  const isCreator = user?.id === tournament?.creator_id;
+  const canManageTournament = user?.id === tournament?.creator_id || 
+                              canManageTournaments() || 
+                              canModerate() || 
+                              isAdmin();
 
   if (loading) {
     return (
@@ -272,12 +277,12 @@ const TournamentDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Tournament Management - only show for creators */}
-            {isCreator && (
+            {/* Tournament Management - show for creators and authorized roles */}
+            {canManageTournament && (
               <TournamentManagement
                 tournament={tournament}
                 participants={participants}
-                isCreator={isCreator}
+                isCreator={user?.id === tournament?.creator_id}
                 onTournamentUpdate={fetchTournamentData}
               />
             )}
@@ -287,7 +292,7 @@ const TournamentDetail = () => {
               <TournamentBracket 
                 tournamentId={tournament.id} 
                 format={tournament.tournament_format}
-                canManage={isCreator}
+                canManage={canManageTournament}
                 onMatchUpdate={fetchTournamentData}
               />
             )}

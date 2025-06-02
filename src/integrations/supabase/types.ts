@@ -298,14 +298,69 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_highest_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_any_role: {
+        Args: {
+          _user_id: string
+          _roles: Database["public"]["Enums"]["app_role"][]
+        }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role:
+        | "player"
+        | "tournament_organizer"
+        | "moderator"
+        | "support_staff"
+        | "financial_manager"
+        | "platform_administrator"
+        | "super_admin"
       match_status: "scheduled" | "in_progress" | "completed" | "disputed"
       payment_status: "pending" | "completed" | "failed" | "refunded"
       tournament_format:
@@ -434,6 +489,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: [
+        "player",
+        "tournament_organizer",
+        "moderator",
+        "support_staff",
+        "financial_manager",
+        "platform_administrator",
+        "super_admin",
+      ],
       match_status: ["scheduled", "in_progress", "completed", "disputed"],
       payment_status: ["pending", "completed", "failed", "refunded"],
       tournament_format: [
