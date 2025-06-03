@@ -31,7 +31,7 @@ const PlatformReports = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isAdmin()) {
+    if (isAdmin) {
       fetchReportData();
     }
   }, [isAdmin, timeRange]);
@@ -181,7 +181,7 @@ const PlatformReports = () => {
     });
   };
 
-  if (!isAdmin()) {
+  if (!isAdmin) {
     return (
       <Card>
         <CardContent className="p-6">
