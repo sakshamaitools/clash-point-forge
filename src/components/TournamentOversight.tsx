@@ -18,6 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Database } from '@/integrations/supabase/types';
+
+type TournamentStatus = Database['public']['Enums']['tournament_status'];
 
 interface Tournament {
   id: string;
@@ -27,7 +30,7 @@ interface Tournament {
   prize_pool: number;
   max_participants: number;
   current_participants: number;
-  status: string;
+  status: TournamentStatus;
   start_time: string;
   registration_deadline: string;
   created_at: string;
@@ -80,7 +83,7 @@ const TournamentOversight = () => {
     }
   };
 
-  const updateTournamentStatus = async (tournamentId: string, newStatus: string) => {
+  const updateTournamentStatus = async (tournamentId: string, newStatus: TournamentStatus) => {
     try {
       const { error } = await supabase
         .from('tournaments')
@@ -134,7 +137,7 @@ const TournamentOversight = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: TournamentStatus) => {
     switch (status) {
       case 'open': return 'bg-green-500';
       case 'in_progress': return 'bg-yellow-500';
@@ -275,7 +278,7 @@ const TournamentOversight = () => {
                     <div className="flex items-center space-x-2">
                       <Select
                         value={tournament.status}
-                        onValueChange={(value) => updateTournamentStatus(tournament.id, value)}
+                        onValueChange={(value: TournamentStatus) => updateTournamentStatus(tournament.id, value)}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
