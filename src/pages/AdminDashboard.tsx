@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +5,9 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RoleManagement from '@/components/RoleManagement';
+import TournamentOversight from '@/components/TournamentOversight';
+import UserManagement from '@/components/UserManagement';
+import PlatformReports from '@/components/PlatformReports';
 import { supabase } from '@/integrations/supabase/client';
 import { Shield, Users, Trophy, DollarSign, Activity } from 'lucide-react';
 
@@ -184,36 +186,15 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="tournaments">
-            <Card>
-              <CardHeader>
-                <CardTitle>Tournament Oversight</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">Tournament management features coming soon...</p>
-              </CardContent>
-            </Card>
+            <TournamentOversight />
           </TabsContent>
 
           <TabsContent value="users">
-            <Card>
-              <CardHeader>
-                <CardTitle>User Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">User management features coming soon...</p>
-              </CardContent>
-            </Card>
+            <UserManagement />
           </TabsContent>
 
           <TabsContent value="reports">
-            <Card>
-              <CardHeader>
-                <CardTitle>Platform Reports</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">Reporting features coming soon...</p>
-              </CardContent>
-            </Card>
+            <PlatformReports />
           </TabsContent>
         </Tabs>
       </div>
