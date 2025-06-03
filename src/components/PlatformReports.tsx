@@ -7,8 +7,9 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, Users, Trophy, DollarSign, Activity, Download, Calendar } from 'lucide-react';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { TrendingUp, Users, Trophy, DollarSign, Activity, Download } from 'lucide-react';
 
 interface ReportData {
   userGrowth: Array<{ month: string; users: number }>;
@@ -31,7 +32,7 @@ const PlatformReports = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isAdmin) {
+    if (isAdmin()) {
       fetchReportData();
     }
   }, [isAdmin, timeRange]);
@@ -181,7 +182,7 @@ const PlatformReports = () => {
     });
   };
 
-  if (!isAdmin) {
+  if (!isAdmin()) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -208,6 +209,29 @@ const PlatformReports = () => {
       </Card>
     );
   }
+
+  const chartConfig = {
+    users: {
+      label: "Users",
+      color: "#3B82F6",
+    },
+    tournaments: {
+      label: "Tournaments",
+      color: "#10B981",
+    },
+    participants: {
+      label: "Participants", 
+      color: "#F59E0B",
+    },
+    revenue: {
+      label: "Revenue",
+      color: "#10B981",
+    },
+    fees: {
+      label: "Entry Fees",
+      color: "#3B82F6",
+    },
+  };
 
   return (
     <div className="space-y-6">
@@ -247,15 +271,15 @@ const PlatformReports = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ChartContainer config={chartConfig} className="h-[300px]">
             <LineChart data={reportData.userGrowth}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="users" stroke="#3B82F6" strokeWidth={2} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line type="monotone" dataKey="users" stroke="var(--color-users)" strokeWidth={2} />
             </LineChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         </CardContent>
       </Card>
 
@@ -268,16 +292,16 @@ const PlatformReports = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ChartContainer config={chartConfig} className="h-[300px]">
             <BarChart data={reportData.tournamentActivity}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip />
-              <Bar dataKey="tournaments" fill="#10B981" name="Tournaments Created" />
-              <Bar dataKey="participants" fill="#F59E0B" name="Total Participants" />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="tournaments" fill="var(--color-tournaments)" name="Tournaments Created" />
+              <Bar dataKey="participants" fill="var(--color-participants)" name="Total Participants" />
             </BarChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         </CardContent>
       </Card>
 
@@ -291,16 +315,19 @@ const PlatformReports = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
+            <ChartContainer config={chartConfig} className="h-[250px]">
               <LineChart data={reportData.revenueData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`$${value}`, '']} />
-                <Line type="monotone" dataKey="revenue" stroke="#10B981" strokeWidth={2} name="Total Revenue" />
-                <Line type="monotone" dataKey="fees" stroke="#3B82F6" strokeWidth={2} name="Entry Fees" />
+                <ChartTooltip 
+                  content={<ChartTooltipContent />}
+                  formatter={(value) => [`$${value}`, '']} 
+                />
+                <Line type="monotone" dataKey="revenue" stroke="var(--color-revenue)" strokeWidth={2} name="Total Revenue" />
+                <Line type="monotone" dataKey="fees" stroke="var(--color-fees)" strokeWidth={2} name="Entry Fees" />
               </LineChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
 
@@ -313,23 +340,25 @@ const PlatformReports = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={reportData.statusDistribution}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {reportData.statusDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="h-[250px] flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={reportData.statusDistribution}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}`}
+                  >
+                    {reportData.statusDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
