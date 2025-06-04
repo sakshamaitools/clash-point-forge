@@ -1,35 +1,34 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Trophy, Users, DollarSign, Gamepad2, Zap, Target, Star } from 'lucide-react';
 import { useEffect } from 'react';
-
 const Index = () => {
-  const { user, loading } = useAuth();
+  const {
+    user,
+    loading
+  } = useAuth();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!loading && user) {
       navigate('/dashboard');
     }
   }, [user, loading, navigate]);
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <div className="cyber-gradient rounded-full h-32 w-32 animate-spin"></div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 relative overflow-hidden">
+  return <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full opacity-20 float-animation"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full opacity-20 float-animation" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-green-400 to-cyan-400 rounded-full opacity-10 float-animation" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full opacity-20 float-animation" style={{
+        animationDelay: '1s'
+      }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-green-400 to-cyan-400 rounded-full opacity-10 float-animation" style={{
+        animationDelay: '2s'
+      }}></div>
       </div>
 
       {/* Hero Section */}
@@ -44,7 +43,7 @@ const Index = () => {
             
             <h1 className="text-6xl md:text-8xl font-black text-white mb-6 text-glow leading-tight">
               FORTNITE
-              <span className="block cyber-gradient bg-clip-text text-transparent animate-pulse">
+              <span className="block cyber-gradient bg-clip-text animate-pulse text-purple-50">
                 TOURNAMENTS
               </span>
             </h1>
@@ -56,20 +55,11 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-12 py-4 text-lg font-bold clip-angle hover-glow transition-all duration-300 transform hover:scale-105" 
-                onClick={() => navigate('/auth')}
-              >
+              <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-12 py-4 text-lg font-bold clip-angle hover-glow transition-all duration-300 transform hover:scale-105" onClick={() => navigate('/auth')}>
                 <Gamepad2 className="mr-2 h-6 w-6" />
                 START GAMING NOW
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-2 border-purple-500 bg-transparent text-purple-300 hover:bg-purple-500 hover:text-white px-12 py-4 text-lg font-bold clip-corner transition-all duration-300 transform hover:scale-105" 
-                onClick={() => navigate('/auth')}
-              >
+              <Button size="lg" variant="outline" className="border-2 border-purple-500 bg-transparent text-purple-300 hover:bg-purple-500 hover:text-white px-12 py-4 text-lg font-bold clip-corner transition-all duration-300 transform hover:scale-105" onClick={() => navigate('/auth')}>
                 <Trophy className="mr-2 h-6 w-6" />
                 VIEW TOURNAMENTS
               </Button>
@@ -151,19 +141,13 @@ const Index = () => {
             <p className="text-gray-300 text-xl mb-8 leading-relaxed">
               Join <span className="text-yellow-400 font-bold">thousands</span> of players already competing in tournaments 🏆
             </p>
-            <Button 
-              size="lg" 
-              className="cyber-gradient text-white px-16 py-6 text-xl font-bold rounded-xl hover-glow transition-all duration-300 transform hover:scale-110" 
-              onClick={() => navigate('/auth')}
-            >
+            <Button size="lg" className="cyber-gradient text-white px-16 py-6 text-xl font-bold rounded-xl hover-glow transition-all duration-300 transform hover:scale-110" onClick={() => navigate('/auth')}>
               <Gamepad2 className="mr-3 h-8 w-8" />
               ENTER THE BATTLE NOW
             </Button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
