@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Users, Trophy, DollarSign, Activity, Download } from 'lucide-react';
 
 interface ReportData {
@@ -272,7 +271,7 @@ const PlatformReports = () => {
         </CardHeader>
         <CardContent>
           <ChartContainer config={chartConfig} className="h-[300px]">
-            <LineChart data={reportData.userGrowth}>
+            <LineChart data={reportData.userGrowth} width={800} height={300}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
@@ -293,7 +292,7 @@ const PlatformReports = () => {
         </CardHeader>
         <CardContent>
           <ChartContainer config={chartConfig} className="h-[300px]">
-            <BarChart data={reportData.tournamentActivity}>
+            <BarChart data={reportData.tournamentActivity} width={800} height={300}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
@@ -316,7 +315,7 @@ const PlatformReports = () => {
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[250px]">
-              <LineChart data={reportData.revenueData}>
+              <LineChart data={reportData.revenueData} width={400} height={250}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
@@ -340,25 +339,23 @@ const PlatformReports = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[250px] flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={reportData.statusDistribution}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
-                  >
-                    {reportData.statusDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            <ChartContainer config={chartConfig} className="h-[250px]">
+              <PieChart width={400} height={250}>
+                <Pie
+                  data={reportData.statusDistribution}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}`}
+                >
+                  {reportData.statusDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </PieChart>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
