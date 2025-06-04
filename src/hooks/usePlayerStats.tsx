@@ -44,7 +44,14 @@ export const usePlayerStats = (userId?: string) => {
 
       if (statsError && statsError.code !== 'PGRST116') throw statsError;
 
-      setStats(statsData);
+      // Convert the data to match our interface
+      if (statsData) {
+        const convertedStats: PlayerStats = {
+          ...statsData,
+          achievements: Array.isArray(statsData.achievements) ? statsData.achievements : []
+        };
+        setStats(convertedStats);
+      }
 
       // Fetch activity logs if viewing own profile
       if (targetUserId === user?.id) {
@@ -56,7 +63,7 @@ export const usePlayerStats = (userId?: string) => {
           .limit(10);
 
         if (activityError) throw activityError;
-        setActivityLogs(activityData || []);
+        setActivityLogs((activityData || []) as ActivityLog[]);
       }
     } catch (error) {
       console.error('Error fetching player stats:', error);

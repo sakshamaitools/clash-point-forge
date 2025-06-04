@@ -74,9 +74,9 @@ export const useFriends = () => {
 
       if (sentError) throw sentError;
 
-      setFriends(friendsData || []);
-      setPendingRequests(pendingData || []);
-      setSentRequests(sentData || []);
+      setFriends((friendsData || []) as Friend[]);
+      setPendingRequests((pendingData || []) as Friend[]);
+      setSentRequests((sentData || []) as Friend[]);
     } catch (error) {
       console.error('Error fetching friends:', error);
       toast({
