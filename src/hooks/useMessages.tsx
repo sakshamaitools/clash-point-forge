@@ -12,9 +12,22 @@ export interface Message {
   created_at: string;
 }
 
-export const useMessages = (recipientId: string) => {
+export interface Conversation {
+  id: string;
+  partner: {
+    id: string;
+    username: string;
+    display_name: string;
+    avatar_url: string;
+  } | null;
+  lastMessage: Message;
+  unreadCount: number;
+}
+
+export const useMessages = (recipientId?: string) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchMessages = async () => {
@@ -37,6 +50,55 @@ export const useMessages = (recipientId: string) => {
     }
   };
 
+  const fetchConversations = async () => {
+    if (!user) return;
+
+    try {
+      // Get all unique conversations for the user
+      const { data: messagesData, error } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          sender:profiles!messages_sender_id_fkey(id, username, display_name, avatar_url),
+          recipient:profiles!messages_recipient_id_fkey(id, username, display_name, avatar_url)
+        `)
+        .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Group messages by conversation partner
+      const conversationMap = new Map<string, Conversation>();
+      
+      (messagesData || []).forEach((message: any) => {
+        const isFromUser = message.sender_id === user.id;
+        const partnerId = isFromUser ? message.recipient_id : message.sender_id;
+        const partner = isFromUser ? message.recipient : message.sender;
+
+        if (!conversationMap.has(partnerId)) {
+          conversationMap.set(partnerId, {
+            id: partnerId,
+            partner,
+            lastMessage: message,
+            unreadCount: 0
+          });
+        }
+
+        // Count unread messages from partner
+        if (!isFromUser && !message.read_at) {
+          const conversation = conversationMap.get(partnerId)!;
+          conversation.unreadCount++;
+        }
+      });
+
+      setConversations(Array.from(conversationMap.values()));
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const sendMessage = async (recipient: string, content: string) => {
     if (!user) return;
 
@@ -50,7 +112,12 @@ export const useMessages = (recipientId: string) => {
         });
 
       if (error) throw error;
-      fetchMessages();
+      
+      if (recipientId) {
+        fetchMessages();
+      } else {
+        fetchConversations();
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -70,7 +137,11 @@ export const useMessages = (recipientId: string) => {
   };
 
   useEffect(() => {
-    fetchMessages();
+    if (recipientId) {
+      fetchMessages();
+    } else {
+      fetchConversations();
+    }
 
     // Set up real-time subscription
     const channel = supabase
@@ -79,9 +150,15 @@ export const useMessages = (recipientId: string) => {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
-        filter: `or(and(sender_id.eq.${user?.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user?.id}))`
+        filter: recipientId 
+          ? `or(and(sender_id.eq.${user?.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user?.id}))`
+          : `or(sender_id.eq.${user?.id},recipient_id.eq.${user?.id})`
       }, () => {
-        fetchMessages();
+        if (recipientId) {
+          fetchMessages();
+        } else {
+          fetchConversations();
+        }
       })
       .subscribe();
 
@@ -92,9 +169,10 @@ export const useMessages = (recipientId: string) => {
 
   return {
     messages,
+    conversations,
     loading,
     sendMessage,
     markAsRead,
-    refetch: fetchMessages
+    refetch: recipientId ? fetchMessages : fetchConversations
   };
 };

@@ -16,7 +16,7 @@ import { format } from 'date-fns';
 const Social = () => {
   const { user } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
-  const { conversations } = useMessages();
+  const { conversations } = useMessages(); // No recipientId parameter for conversations view
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('friends');
 
