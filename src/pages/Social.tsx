@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,13 +12,24 @@ import { useMessages } from '@/hooks/useMessages';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { toast } from '@/hooks/use-toast';
 
 const Social = () => {
   const { user } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
-  const { conversations } = useMessages(); // No recipientId parameter for conversations view
+  const { conversations, loading: conversationsLoading } = useMessages();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('friends');
+
+  useEffect(() => {
+    // Auto-switch to messages tab if there's a notification
+    if (conversations.some(c => c.unreadCount > 0) && activeTab !== 'messages') {
+      toast({
+        title: "New message received",
+        description: "You have unread messages",
+      });
+    }
+  }, [conversations]);
 
   if (!user) {
     return (
@@ -33,6 +44,8 @@ const Social = () => {
       </div>
     );
   }
+
+  const totalUnreadMessages = conversations.reduce((sum, c) => sum + c.unreadCount, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 py-8">
@@ -53,9 +66,9 @@ const Social = () => {
             <TabsTrigger value="messages" className="text-white data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-400">
               <MessageCircle className="h-4 w-4 mr-2" />
               Messages
-              {conversations.filter(c => c.unreadCount > 0).length > 0 && (
+              {totalUnreadMessages > 0 && (
                 <Badge className="ml-2 bg-red-600 text-white text-xs">
-                  {conversations.reduce((sum, c) => sum + c.unreadCount, 0)}
+                  {totalUnreadMessages}
                 </Badge>
               )}
             </TabsTrigger>
@@ -111,7 +124,11 @@ const Social = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {conversations.length === 0 ? (
+                {conversationsLoading ? (
+                  <div className="flex items-center justify-center py-10">
+                    <div className="cyber-gradient rounded-full h-8 w-8 animate-spin"></div>
+                  </div>
+                ) : conversations.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>No conversations yet. Send a message to start chatting!</p>
@@ -122,7 +139,11 @@ const Social = () => {
                       <div
                         key={conversation.id}
                         onClick={() => navigate(`/chat/${conversation.id}`)}
-                        className="flex items-center space-x-4 p-4 bg-black/20 rounded-lg hover:bg-black/30 cursor-pointer transition-all"
+                        className={`flex items-center space-x-4 p-4 rounded-lg cursor-pointer transition-all ${
+                          conversation.unreadCount > 0 
+                            ? 'bg-blue-900/20 hover:bg-blue-900/30 border border-blue-500/50' 
+                            : 'bg-black/20 hover:bg-black/30'
+                        }`}
                       >
                         <Avatar>
                           <AvatarImage src={conversation.partner?.avatar_url} />
@@ -132,13 +153,18 @@ const Social = () => {
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
-                            <h4 className="text-white font-bold">{conversation.partner?.display_name}</h4>
+                            <h4 className={`font-bold ${conversation.unreadCount > 0 ? 'text-blue-300' : 'text-white'}`}>
+                              {conversation.partner?.display_name}
+                            </h4>
                             <span className="text-gray-400 text-sm">
-                              {format(new Date(conversation.lastMessage.created_at), 'HH:mm')}
+                              {conversation.lastMessage?.created_at && 
+                                format(new Date(conversation.lastMessage.created_at), 'HH:mm')}
                             </span>
                           </div>
-                          <p className="text-gray-400 text-sm truncate">
-                            {conversation.lastMessage.content}
+                          <p className={`text-sm truncate ${
+                            conversation.unreadCount > 0 ? 'text-white' : 'text-gray-400'
+                          }`}>
+                            {conversation.lastMessage?.content}
                           </p>
                         </div>
                         {conversation.unreadCount > 0 && (

@@ -1,11 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import ChatWindow from '@/components/ChatWindow';
+import { useAuth } from '@/hooks/useAuth';
 
 const Chat = () => {
   const { userId } = useParams<{ userId: string }>();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [recipientProfile, setRecipientProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -31,6 +34,24 @@ const Chat = () => {
 
     fetchRecipientProfile();
   }, [userId]);
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-black text-white mb-4">Please Sign In</h1>
+          <p className="text-gray-300 mb-6">You need to be signed in to access messages</p>
+          <button 
+            onClick={() => navigate('/auth')}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

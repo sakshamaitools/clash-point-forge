@@ -34,6 +34,7 @@ export const useMessages = (recipientId?: string) => {
     if (!user || !recipientId) return;
 
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('messages')
         .select('*')
@@ -54,6 +55,7 @@ export const useMessages = (recipientId?: string) => {
     if (!user) return;
 
     try {
+      setLoading(true);
       // Get all unique conversations for the user
       const { data: messagesData, error } = await supabase
         .from('messages')
@@ -87,7 +89,7 @@ export const useMessages = (recipientId?: string) => {
         // Count unread messages from partner
         if (!isFromUser && !message.read_at) {
           const conversation = conversationMap.get(partnerId)!;
-          conversation.unreadCount++;
+          conversation.unreadCount = (conversation.unreadCount || 0) + 1;
         }
       });
 
@@ -150,9 +152,11 @@ export const useMessages = (recipientId?: string) => {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
-        filter: recipientId 
-          ? `or(and(sender_id.eq.${user?.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user?.id}))`
-          : `or(sender_id.eq.${user?.id},recipient_id.eq.${user?.id})`
+        filter: user?.id 
+          ? recipientId 
+              ? `or(and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id}))`
+              : `or(sender_id.eq.${user.id},recipient_id.eq.${user.id})`
+          : undefined
       }, () => {
         if (recipientId) {
           fetchMessages();
