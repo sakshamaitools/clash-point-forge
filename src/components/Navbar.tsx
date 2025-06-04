@@ -1,9 +1,10 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useNotifications } from '@/hooks/useNotifications';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Trophy, User, Shield, Settings, Zap, Crown } from 'lucide-react';
+import { LogOut, Trophy, User, Shield, Settings, Zap, Crown, Users, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ import {
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const { highestRole, isAdmin, canManageTournaments, loading } = useUserRoles();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -54,6 +56,21 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
+                {/* Social Hub Button */}
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate('/social')}
+                  className="text-cyan-400 hover:text-white hover:bg-cyan-500/20 font-bold border border-cyan-500/30 clip-corner transition-all duration-300 relative"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  SOCIAL HUB
+                  {unreadCount > 0 && (
+                    <Badge className="absolute -top-1 -right-1 bg-red-600 text-white text-xs h-5 w-5 rounded-full flex items-center justify-center p-0">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+
                 {/* Role-based navigation items */}
                 {canManageTournaments() && (
                   <Button 
@@ -108,6 +125,18 @@ const Navbar = () => {
                     >
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => navigate('/social')}
+                      className="text-white hover:bg-green-500/20 hover:text-green-400 cursor-pointer"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Social Hub</span>
+                      {unreadCount > 0 && (
+                        <Badge className="ml-auto bg-red-600 text-white text-xs">
+                          {unreadCount}
+                        </Badge>
+                      )}
                     </DropdownMenuItem>
                     {isAdmin() && (
                       <DropdownMenuItem 
