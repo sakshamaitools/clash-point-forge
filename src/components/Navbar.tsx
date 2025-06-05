@@ -58,7 +58,10 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button asChild variant="outline">
+          <Button 
+            asChild 
+            className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white border-0 px-6 py-2 font-semibold hover-glow transition-all duration-300"
+          >
             <Link to="/auth">Sign In</Link>
           </Button>
         )}
