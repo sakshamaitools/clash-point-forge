@@ -22,7 +22,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between px-6 py-3">
+    <nav className="flex items-center justify-between px-6 py-3 w-full">
       <div className="flex items-center space-x-2">
         <Link to="/" className="text-xl font-black text-transparent bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text hover:opacity-80 transition-opacity">
           TourneyForge
