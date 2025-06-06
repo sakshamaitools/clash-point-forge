@@ -44,6 +44,63 @@ export type Database = {
           },
         ]
       }
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
+      content_validation_rules: {
+        Row: {
+          created_at: string | null
+          field_name: string
+          id: string
+          is_active: boolean | null
+          max_length: number | null
+          min_length: number | null
+          pattern: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          field_name: string
+          id?: string
+          is_active?: boolean | null
+          max_length?: number | null
+          min_length?: number | null
+          pattern?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          field_name?: string
+          id?: string
+          is_active?: boolean | null
+          max_length?: number | null
+          min_length?: number | null
+          pattern?: string | null
+        }
+        Relationships: []
+      }
       friends: {
         Row: {
           addressee_id: string
@@ -553,6 +610,24 @@ export type Database = {
           _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
         }
+        Returns: boolean
+      }
+      user_has_any_role: {
+        Args: {
+          _user_id: string
+          _roles: Database["public"]["Enums"]["app_role"][]
+        }
+        Returns: boolean
+      }
+      user_has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
+      validate_content_length: {
+        Args: { field_name: string; content: string }
         Returns: boolean
       }
     }

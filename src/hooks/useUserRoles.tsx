@@ -52,7 +52,7 @@ export const useUserRoles = () => {
 
       setRoles(data || []);
       
-      // Get highest role
+      // Get highest role using the new secure function
       const { data: highestRoleData, error: roleError } = await supabase
         .rpc('get_user_highest_role', { _user_id: user.id });
 
