@@ -88,7 +88,7 @@ const EnhancedUserManagement = () => {
             .eq('winner_id', profile.id);
 
           // Fetch analytics
-          const { data: analytics } = await supabase
+          const { data: analyticsData } = await supabase
             .from('player_analytics')
             .select('skill_metrics, improvement_areas')
             .eq('user_id', profile.id)
@@ -102,7 +102,15 @@ const EnhancedUserManagement = () => {
             .order('created_at', { ascending: false })
             .limit(5);
 
-          return {
+          // Convert analytics data to proper types
+          const analytics = analyticsData ? {
+            skill_metrics: analyticsData.skill_metrics,
+            improvement_areas: Array.isArray(analyticsData.improvement_areas) 
+              ? analyticsData.improvement_areas 
+              : []
+          } : undefined;
+
+          const enhancedProfile: EnhancedUserProfile = {
             ...profile,
             platform_currency: currency,
             crypto_wallets: wallets || [],
@@ -110,6 +118,8 @@ const EnhancedUserManagement = () => {
             analytics,
             anti_cheat_reports: reports || []
           };
+
+          return enhancedProfile;
         })
       );
 

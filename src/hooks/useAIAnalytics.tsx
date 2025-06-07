@@ -52,7 +52,16 @@ export const useAIAnalytics = () => {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      setAnalytics(data);
+      
+      if (data) {
+        // Convert Json types to proper TypeScript types
+        const convertedAnalytics: PlayerAnalytics = {
+          ...data,
+          improvement_areas: Array.isArray(data.improvement_areas) ? data.improvement_areas : [],
+          ai_recommendations: Array.isArray(data.ai_recommendations) ? data.ai_recommendations : []
+        };
+        setAnalytics(convertedAnalytics);
+      }
     } catch (error) {
       console.error('Error fetching analytics:', error);
     }
@@ -110,12 +119,19 @@ export const useAIAnalytics = () => {
         recommendations.push('Focus on dealing more damage per engagement');
       }
 
+      // Convert arrays to proper format for database storage
+      const playPatterns = {
+        recent_games: performance.slice(0, 5).length,
+        avg_kills: avgKills,
+        avg_placement: avgPlacement
+      };
+
       const { error } = await supabase
         .from('player_analytics')
         .upsert({
           user_id: user.id,
           skill_metrics: skillMetrics,
-          play_patterns: { recent_performance: performance.slice(0, 5) },
+          play_patterns: playPatterns,
           improvement_areas: improvements,
           ai_recommendations: recommendations,
           last_analysis: new Date().toISOString(),

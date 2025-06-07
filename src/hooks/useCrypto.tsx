@@ -75,7 +75,7 @@ export const useCrypto = () => {
     if (!user) return;
 
     try {
-      if (walletType === 'metamask' && typeof window.ethereum !== 'undefined') {
+      if (walletType === 'metamask' && window.ethereum) {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const walletAddress = accounts[0];
 
@@ -96,6 +96,12 @@ export const useCrypto = () => {
         });
 
         fetchWallets();
+      } else {
+        toast({
+          title: "MetaMask Not Found",
+          description: "Please install MetaMask to connect your wallet",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Error connecting wallet:', error);
