@@ -28,6 +28,14 @@ interface PerformanceMetric {
   recorded_at: string;
 }
 
+// Helper function to safely convert Json to string array
+const convertToStringArray = (jsonData: any): string[] => {
+  if (Array.isArray(jsonData)) {
+    return jsonData.filter(item => typeof item === 'string');
+  }
+  return [];
+};
+
 export const useAIAnalytics = () => {
   const { user } = useAuth();
   const [analytics, setAnalytics] = useState<PlayerAnalytics | null>(null);
@@ -57,8 +65,8 @@ export const useAIAnalytics = () => {
         // Convert Json types to proper TypeScript types
         const convertedAnalytics: PlayerAnalytics = {
           ...data,
-          improvement_areas: Array.isArray(data.improvement_areas) ? data.improvement_areas : [],
-          ai_recommendations: Array.isArray(data.ai_recommendations) ? data.ai_recommendations : []
+          improvement_areas: convertToStringArray(data.improvement_areas),
+          ai_recommendations: convertToStringArray(data.ai_recommendations)
         };
         setAnalytics(convertedAnalytics);
       }

@@ -40,6 +40,14 @@ interface EnhancedUserProfile {
   }>;
 }
 
+// Helper function to safely convert Json to string array
+const convertToStringArray = (jsonData: any): string[] => {
+  if (Array.isArray(jsonData)) {
+    return jsonData.filter(item => typeof item === 'string');
+  }
+  return [];
+};
+
 const EnhancedUserManagement = () => {
   const { user } = useAuth();
   const { isAdmin } = useUserRoles();
@@ -105,9 +113,7 @@ const EnhancedUserManagement = () => {
           // Convert analytics data to proper types
           const analytics = analyticsData ? {
             skill_metrics: analyticsData.skill_metrics,
-            improvement_areas: Array.isArray(analyticsData.improvement_areas) 
-              ? analyticsData.improvement_areas 
-              : []
+            improvement_areas: convertToStringArray(analyticsData.improvement_areas)
           } : undefined;
 
           const enhancedProfile: EnhancedUserProfile = {
