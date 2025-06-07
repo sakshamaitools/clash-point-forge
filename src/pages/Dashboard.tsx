@@ -2,11 +2,14 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useCrypto } from '@/hooks/useCrypto';
+import { useNFTRewards } from '@/hooks/useNFTRewards';
+import { useAIAnalytics } from '@/hooks/useAIAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trophy, Users, DollarSign, Shield, Zap, Target, Star, Crown } from 'lucide-react';
+import { Plus, Trophy, Users, DollarSign, Shield, Zap, Target, Star, Crown, BarChart, Coins, Brain } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface Tournament {
@@ -25,6 +28,9 @@ interface Tournament {
 const Dashboard = () => {
   const { user } = useAuth();
   const { canManageTournaments, isAdmin, highestRole } = useUserRoles();
+  const { currency } = useCrypto();
+  const { nfts } = useNFTRewards();
+  const { analytics } = useAIAnalytics();
   const navigate = useNavigate();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +123,7 @@ const Dashboard = () => {
             )}
             {isAdmin() && (
               <Button 
-                onClick={() => navigate('/admin')} 
+                onClick={() => navigate('/enhanced-admin')} 
                 variant="outline" 
                 className="border-2 border-purple-500 bg-transparent text-purple-300 hover:bg-purple-500 hover:text-white font-bold px-6 py-3 clip-corner transition-all duration-300"
               >
@@ -128,6 +134,78 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Advanced Features Preview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="gaming-card bg-black/40 border-0 hover-glow transition-all duration-300 group cursor-pointer" onClick={() => navigate('/economics')}>
+            <CardHeader className="relative">
+              <CardTitle className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors flex items-center">
+                <DollarSign className="h-6 w-6 mr-2 text-green-400" />
+                Economics Hub
+              </CardTitle>
+              <CardDescription className="text-gray-300">
+                Manage crypto wallets, NFTs, and betting
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Platform Balance:</span>
+                <span className="text-green-400 font-bold">{currency?.balance || 0} coins</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">NFTs Owned:</span>
+                <span className="text-purple-400 font-bold">{nfts?.length || 0}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="gaming-card bg-black/40 border-0 hover-glow transition-all duration-300 group cursor-pointer" onClick={() => navigate('/analytics')}>
+            <CardHeader className="relative">
+              <CardTitle className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors flex items-center">
+                <Brain className="h-6 w-6 mr-2 text-blue-400" />
+                AI Analytics
+              </CardTitle>
+              <CardDescription className="text-gray-300">
+                Performance insights and recommendations
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-400">K/D Ratio:</span>
+                <span className="text-blue-400 font-bold">{analytics?.skill_metrics?.kill_death_ratio?.toFixed(2) || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Improvement Areas:</span>
+                <span className="text-orange-400 font-bold">{analytics?.improvement_areas?.length || 0}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {isAdmin() && (
+            <Card className="gaming-card bg-black/40 border-0 hover-glow transition-all duration-300 group cursor-pointer" onClick={() => navigate('/enhanced-admin')}>
+              <CardHeader className="relative">
+                <CardTitle className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors flex items-center">
+                  <Shield className="h-6 w-6 mr-2 text-red-400" />
+                  Enhanced Admin
+                </CardTitle>
+                <CardDescription className="text-gray-300">
+                  Advanced user management and security
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">User Oversight:</span>
+                  <span className="text-red-400 font-bold">Active</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Security Status:</span>
+                  <span className="text-green-400 font-bold">Protected</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Tournament Grid */}
         {loading ? (
           <div className="text-center py-16">
             <div className="cyber-gradient rounded-full h-32 w-32 mx-auto mb-6 animate-spin"></div>

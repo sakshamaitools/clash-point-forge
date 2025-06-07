@@ -21,6 +21,9 @@ const Chat = lazy(() => import("./pages/Chat"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Players = lazy(() => import("./pages/Players"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
+const Economics = lazy(() => import("./pages/Economics"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const EnhancedAdmin = lazy(() => import("./pages/EnhancedAdmin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -47,6 +50,9 @@ const AppContent = () => {
                   <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/enhanced-admin" element={<EnhancedAdmin />} />
+                  <Route path="/economics" element={<Economics />} />
+                  <Route path="/analytics" element={<Analytics />} />
                   <Route path="/create-tournament" element={<CreateTournament />} />
                   <Route path="/tournament/:id" element={<TournamentDetail />} />
                   <Route path="/auth" element={<Auth />} />
